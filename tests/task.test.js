@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Task } from '../src/models/task.js';
 
-test('Task constructor applies defaults for status, priority, and description', () => {
+test('Task constructor applies defaults for status, priority, description, and category', () => {
   const task = new Task({ title: '  Plan release  ' });
 
   assert.equal(task.title, 'Plan release');
   assert.equal(task.description, '');
+  assert.equal(task.category, 'general');
   assert.equal(task.status, 'todo');
   assert.equal(task.priority, 'medium');
 });
@@ -30,13 +31,14 @@ test('Task constructor rejects updatedAt earlier than createdAt', () => {
   );
 });
 
-test('Task update applies title and status changes', () => {
+test('Task update applies title, status, and category changes', () => {
   const task = new Task({ title: 'Initial', status: 'todo' });
 
-  task.update({ title: 'Updated', status: 'done' });
+  task.update({ title: 'Updated', status: 'done', category: 'work' });
 
   assert.equal(task.title, 'Updated');
   assert.equal(task.status, 'done');
+  assert.equal(task.category, 'work');
 });
 
 test('Task update rejects invalid patch input', () => {
@@ -61,6 +63,7 @@ test('Task clone creates a new task with copied fields and different id', () => 
   assert.notEqual(clone.id, original.id);
   assert.equal(clone.title, original.title);
   assert.equal(clone.description, original.description);
+  assert.equal(clone.category, original.category);
   assert.equal(clone.status, original.status);
   assert.equal(clone.priority, original.priority);
 });
@@ -73,6 +76,7 @@ test('Task toJSON returns a plain object with task fields', () => {
   assert.equal(typeof result, 'object');
   assert.equal(result.id, task.id);
   assert.equal(result.title, task.title);
+  assert.equal(result.category, task.category);
   assert.equal(result.status, task.status);
 });
 

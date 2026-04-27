@@ -65,6 +65,19 @@ export function validatePriority(priority) {
 }
 
 /**
+ * Validates and normalizes task category.
+ * @param {unknown} category
+ * @returns {string}
+ */
+export function validateCategory(category) {
+  if (!isNonEmptyString(category)) {
+    throw new TypeError('Invalid task category: expected a non-empty string.');
+  }
+
+  return category.trim();
+}
+
+/**
  * Validates and normalizes an ISO timestamp.
  * @param {unknown} timestamp
  * @param {string} fieldName
@@ -94,7 +107,7 @@ export function validateTaskId(id) {
 /**
  * Validates list options used by task queries.
  * @param {unknown} options
- * @returns {{status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high', sortBy?: 'priority' | 'createdAt', direction?: 'asc' | 'desc'}}
+ * @returns {{status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high', category?: string, sortBy?: 'priority' | 'createdAt', direction?: 'asc' | 'desc'}}
  */
 export function validateListOptions(options = {}) {
   if (options === null || typeof options !== 'object' || Array.isArray(options)) {
@@ -109,6 +122,10 @@ export function validateListOptions(options = {}) {
 
   if (Object.hasOwn(options, 'priority') && options.priority !== undefined) {
     normalized.priority = validatePriority(options.priority);
+  }
+
+  if (Object.hasOwn(options, 'category') && options.category !== undefined) {
+    normalized.category = validateCategory(options.category);
   }
 
   if (Object.hasOwn(options, 'sortBy') && options.sortBy !== undefined) {

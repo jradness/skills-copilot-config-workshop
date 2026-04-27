@@ -46,11 +46,19 @@ Acceptance criteria:
 3. Sorting by createdAt supports ascending and descending order.
 4. Invalid sort options return clear guidance.
 
+7. As a user, I want to organize tasks by category so I can group related work.
+Acceptance criteria:
+1. The create command accepts an optional category string.
+2. Tasks default to category general when category is omitted.
+3. A category filter operation returns only tasks matching the provided category.
+4. A category listing operation returns all unique categories currently in memory.
+
 ## Data model
 1. Entity: Task
 - id: number
 - title: string
 - description: string
+- category: string
 - status: "todo" | "in-progress" | "done"
 - priority: "low" | "medium" | "high"
 - createdAt: string (ISO 8601 timestamp)

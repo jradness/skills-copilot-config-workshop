@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import {
+  validateCategory,
   normalizeDescription,
   validateIsoTimestamp,
   validatePriority,
@@ -18,6 +19,7 @@ export class Task {
    *   id?: string,
    *   title: string,
    *   description?: string,
+  *   category?: string,
    *   status?: 'todo' | 'in-progress' | 'done',
    *   priority?: 'low' | 'medium' | 'high',
    *   createdAt?: string,
@@ -37,6 +39,7 @@ export class Task {
     this.id = validateTaskId(id);
     this.title = validateTitle(input.title);
     this.description = normalizeDescription(input.description);
+    this.category = validateCategory(input.category ?? 'general');
     this.status = validateStatus(input.status ?? 'todo');
     this.priority = validatePriority(input.priority ?? 'medium');
     this.createdAt = validateIsoTimestamp(createdAt, 'createdAt');
@@ -49,7 +52,7 @@ export class Task {
 
   /**
    * Applies a partial update and refreshes the `updatedAt` timestamp.
-   * @param {{title?: string, description?: string, status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high'}} patch
+    * @param {{title?: string, description?: string, category?: string, status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high'}} patch
    * @returns {Task}
    */
   update(patch) {
@@ -63,6 +66,10 @@ export class Task {
 
     if (Object.hasOwn(patch, 'description')) {
       this.description = normalizeDescription(patch.description);
+    }
+
+    if (Object.hasOwn(patch, 'category')) {
+      this.category = validateCategory(patch.category);
     }
 
     if (Object.hasOwn(patch, 'status')) {
@@ -85,6 +92,7 @@ export class Task {
     return new Task({
       title: this.title,
       description: this.description,
+      category: this.category,
       status: this.status,
       priority: this.priority,
     });
@@ -96,6 +104,7 @@ export class Task {
    *   id: string,
    *   title: string,
    *   description: string,
+  *   category: string,
    *   status: 'todo' | 'in-progress' | 'done',
    *   priority: 'low' | 'medium' | 'high',
    *   createdAt: string,
@@ -107,6 +116,7 @@ export class Task {
       id: this.id,
       title: this.title,
       description: this.description,
+      category: this.category,
       status: this.status,
       priority: this.priority,
       createdAt: this.createdAt,

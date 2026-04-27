@@ -1,5 +1,5 @@
 import { Task } from '../models/task.js';
-import { validateListOptions, validateTaskId } from '../utils/validators.js';
+import { validateCategory, validateListOptions, validateTaskId } from '../utils/validators.js';
 
 const taskStore = [];
 const priorityRank = {
@@ -10,11 +10,12 @@ const priorityRank = {
 
 /**
  * Creates and stores a new task.
- * @param {{title: string, description?: string, status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high'}} input
+ * @param {{title: string, description?: string, category?: string, status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high'}} input
  * @returns {{
  *   id: string,
  *   title: string,
  *   description: string,
+ *   category: string,
  *   status: 'todo' | 'in-progress' | 'done',
  *   priority: 'low' | 'medium' | 'high',
  *   createdAt: string,
@@ -33,11 +34,12 @@ export function createTask(input) {
 
 /**
  * Lists tasks with optional filtering and sorting.
- * @param {{status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high', sortBy?: 'priority' | 'createdAt', direction?: 'asc' | 'desc'}} [options]
+ * @param {{status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high', category?: string, sortBy?: 'priority' | 'createdAt', direction?: 'asc' | 'desc'}} [options]
  * @returns {Array<{
  *   id: string,
  *   title: string,
  *   description: string,
+ *   category: string,
  *   status: 'todo' | 'in-progress' | 'done',
  *   priority: 'low' | 'medium' | 'high',
  *   createdAt: string,
@@ -57,6 +59,10 @@ export function listTasks(options = {}) {
 
     if (normalizedOptions.priority) {
       results = results.filter((task) => task.priority === normalizedOptions.priority);
+    }
+
+    if (normalizedOptions.category) {
+      results = results.filter((task) => task.category === normalizedOptions.category);
     }
 
     if (normalizedOptions.sortBy === 'priority') {
@@ -80,11 +86,12 @@ export function listTasks(options = {}) {
 /**
  * Updates an existing task by id.
  * @param {string} id
- * @param {{title?: string, description?: string, status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high'}} patch
+ * @param {{title?: string, description?: string, category?: string, status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high'}} patch
  * @returns {{
  *   id: string,
  *   title: string,
  *   description: string,
+ *   category: string,
  *   status: 'todo' | 'in-progress' | 'done',
  *   priority: 'low' | 'medium' | 'high',
  *   createdAt: string,
@@ -117,6 +124,7 @@ export function updateTask(id, patch) {
  *   id: string,
  *   title: string,
  *   description: string,
+ *   category: string,
  *   status: 'todo' | 'in-progress' | 'done',
  *   priority: 'low' | 'medium' | 'high',
  *   createdAt: string,
@@ -140,4 +148,37 @@ export function deleteTask(id) {
     }
     throw new Error(`Invalid input for deleteTask: ${error.message}`);
   }
+}
+
+/**
+ * Filters tasks using a category value.
+ * @param {string} category
+ * @returns {Array<{
+ *   id: string,
+ *   title: string,
+ *   description: string,
+ *   category: string,
+ *   status: 'todo' | 'in-progress' | 'done',
+ *   priority: 'low' | 'medium' | 'high',
+ *   createdAt: string,
+ *   updatedAt: string
+ * }>}
+ */
+export function filterTasksByCategory(category) {
+  try {
+    const normalizedCategory = validateCategory(category);
+    return taskStore
+      .filter((task) => task.category === normalizedCategory)
+      .map((task) => task.toJSON());
+  } catch (error) {
+    throw new Error(`Invalid input for filterTasksByCategory: ${error.message}`);
+  }
+}
+
+/**
+ * Lists all unique task categories.
+ * @returns {string[]}
+ */
+export function listCategories() {
+  return [...new Set(taskStore.map((task) => task.category))].sort();
 }

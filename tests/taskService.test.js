@@ -17,8 +17,17 @@ test('createTask returns a stored task with defaults', async () => {
   const task = service.createTask({ title: 'Create this task' });
 
   assert.equal(task.title, 'Create this task');
+  assert.equal(task.category, 'general');
   assert.equal(task.status, 'todo');
   assert.equal(task.priority, 'medium');
+});
+
+test('createTask stores a provided category', async () => {
+  const service = await loadFreshService();
+
+  const task = service.createTask({ title: 'Write docs', category: 'docs' });
+
+  assert.equal(task.category, 'docs');
 });
 
 test('createTask throws for invalid input', async () => {
@@ -51,6 +60,18 @@ test('listTasks filters by status', async () => {
 
   assert.equal(tasks.length, 1);
   assert.equal(tasks[0].status, 'done');
+});
+
+test('listTasks filters by category', async () => {
+  const service = await loadFreshService();
+
+  service.createTask({ title: 'Plan', category: 'planning' });
+  service.createTask({ title: 'Code', category: 'development' });
+
+  const tasks = service.listTasks({ category: 'planning' });
+
+  assert.equal(tasks.length, 1);
+  assert.equal(tasks[0].category, 'planning');
 });
 
 test('listTasks sorts by priority from high to low', async () => {
@@ -130,4 +151,38 @@ test('deleteTask throws when task id does not exist', async () => {
     () => service.deleteTask('missing-id'),
     /Task not found for id/
   );
+});
+
+test('filterTasksByCategory returns matching tasks', async () => {
+  const service = await loadFreshService();
+
+  service.createTask({ title: 'Docs 1', category: 'docs' });
+  service.createTask({ title: 'Ops 1', category: 'ops' });
+  service.createTask({ title: 'Docs 2', category: 'docs' });
+
+  const tasks = service.filterTasksByCategory('docs');
+
+  assert.equal(tasks.length, 2);
+  assert.equal(tasks.every((task) => task.category === 'docs'), true);
+});
+
+test('filterTasksByCategory throws for invalid category input', async () => {
+  const service = await loadFreshService();
+
+  assert.throws(
+    () => service.filterTasksByCategory('   '),
+    /Invalid input for filterTasksByCategory/
+  );
+});
+
+test('listCategories returns sorted unique categories', async () => {
+  const service = await loadFreshService();
+
+  service.createTask({ title: 'A', category: 'ops' });
+  service.createTask({ title: 'B', category: 'docs' });
+  service.createTask({ title: 'C', category: 'ops' });
+
+  const categories = service.listCategories();
+
+  assert.deepEqual(categories, ['docs', 'ops']);
 });

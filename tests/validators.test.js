@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   isNonEmptyString,
   normalizeDescription,
+  validateCategory,
   validateIsoTimestamp,
   validateListOptions,
   validatePriority,
@@ -91,6 +92,18 @@ test('validatePriority throws for undefined', () => {
   assert.throws(() => validatePriority(undefined), /Invalid task priority/);
 });
 
+test('validateCategory trims and returns valid categories', () => {
+  assert.equal(validateCategory('  work  '), 'work');
+});
+
+test('validateCategory throws for blank category values', () => {
+  assert.throws(() => validateCategory('   '), /Invalid task category/);
+});
+
+test('validateCategory throws for non-string category values', () => {
+  assert.throws(() => validateCategory(123), /Invalid task category/);
+});
+
 test('validateIsoTimestamp accepts valid ISO timestamp strings', () => {
   const value = '2026-04-27T12:00:00.000Z';
   assert.equal(validateIsoTimestamp(value, 'createdAt'), value);
@@ -124,6 +137,7 @@ test('validateListOptions normalizes valid option combinations', () => {
   const result = validateListOptions({
     status: 'todo',
     priority: 'low',
+    category: 'planning',
     sortBy: 'createdAt',
     direction: 'asc',
   });
@@ -131,6 +145,7 @@ test('validateListOptions normalizes valid option combinations', () => {
   assert.deepEqual(result, {
     status: 'todo',
     priority: 'low',
+    category: 'planning',
     sortBy: 'createdAt',
     direction: 'asc',
   });
@@ -170,4 +185,8 @@ test('validateListOptions throws for invalid status value type', () => {
 
 test('validateListOptions throws for invalid priority value type', () => {
   assert.throws(() => validateListOptions({ priority: -1 }), /Invalid task priority/);
+});
+
+test('validateListOptions throws for invalid category value type', () => {
+  assert.throws(() => validateListOptions({ category: null }), /Invalid task category/);
 });

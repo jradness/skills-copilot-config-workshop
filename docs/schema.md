@@ -9,6 +9,7 @@
 | id | number | yes | Must be an integer greater than 0; generated only by store sequence (`TaskStore.nextId`); unique across `TaskStore.tasks`; immutable after create. |
 | title | string | yes | Input is trimmed before validation; must not be empty after trim; create fails if missing or blank; update with blank value is rejected. |
 | description | string | no | Optional; if provided, coerce to string and trim surrounding whitespace; omitted value is stored as an empty string for stable output shape. |
+| category | string | yes | Optional on create; defaults to `general`; value is trimmed and must be a non-empty string; invalid values reject create/update/filter operations. |
 | status | 'todo' \| 'in-progress' \| 'done' | yes | Enum only: `todo`, `in-progress`, `done`; defaults to `todo` on create when omitted; invalid values reject create/update. |
 | priority | 'low' \| 'medium' \| 'high' | yes | Enum only: `low`, `medium`, `high`; defaults to `medium` on create when omitted; invalid values reject create/update. |
 | createdAt | string (ISO 8601) | yes | Must be a valid ISO 8601 timestamp string (`!Number.isNaN(Date.parse(value))`); set once at creation; never modified by update operations. |
@@ -27,6 +28,7 @@
 | --- | --- | --- | --- |
 | status | 'todo' \| 'in-progress' \| 'done' | no | If provided, must be one of allowed status values. |
 | priority | 'low' \| 'medium' \| 'high' | no | If provided, must be one of allowed priority values. |
+| category | string | no | If provided, must be a non-empty string after trimming. |
 | sortBy | 'priority' \| 'createdAt' | no | If provided, must be `priority` or `createdAt`. |
 | direction | 'asc' \| 'desc' | no | Only applicable when `sortBy=createdAt`; defaults to `desc` if omitted. |
 
@@ -41,7 +43,7 @@ src/
     update-task.js        # Handles update command and partial field updates by id
     delete-task.js        # Handles delete command and user-facing confirmation
   services/
-    task-service.js       # Core task CRUD, filtering, sorting, and store mutation rules
+    task-service.js       # Core task CRUD, filtering, sorting, category operations, and store mutation rules
   models/
     task.js               # Task factory/defaults and model-level normalization helpers
   store/
@@ -79,8 +81,8 @@ src/
 - Depends on: `services/task-service.js`, `utils/validators.js`, `utils/formatter.js`.
 
 ### src/services/task-service.js
-- Exports: `createTask(input)`, `listTasks(options)`, `updateTask(id, patch)`, `deleteTask(id)`.
-- Responsibilities: enforce domain rules, read/write in-memory store, keep mutation atomic, perform filtering/sorting.
+- Exports: `createTask(input)`, `listTasks(options)`, `updateTask(id, patch)`, `deleteTask(id)`, `filterTasksByCategory(category)`, `listCategories()`.
+- Responsibilities: enforce domain rules, read/write in-memory store, keep mutation atomic, perform filtering/sorting, and provide category-focused queries.
 - Depends on: `store/in-memory-store.js`, `models/task.js`, `utils/validators.js`.
 
 ### src/models/task.js
