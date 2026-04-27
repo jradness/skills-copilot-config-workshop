@@ -32,5 +32,6 @@
 
 ## Dependencies
 
-- Do not add external dependencies.
-- Use only built-in Node.js modules (fs, path, assert, crypto, etc.).
+- Use only built-in Node.js modules for core functionality.
+- The `chalk` package is approved for terminal output formatting.
+- Do not add other external dependencies without approval.
