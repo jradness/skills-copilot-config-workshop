@@ -1,4 +1,19 @@
-import chalk from 'chalk';
+const RESET = '\x1b[0m';
+const GREEN = '\x1b[32m';
+const YELLOW = '\x1b[33m';
+const RED = '\x1b[31m';
+const BOLD = '\x1b[1m';
+const DIM = '\x1b[2m';
+
+/**
+ * Wraps text with an ANSI escape sequence and resets afterward.
+ * @param {string} codes - ANSI escape codes to apply.
+ * @param {string} text - Text to wrap.
+ * @returns {string}
+ */
+function ansi(codes, text) {
+  return `${codes}${text}${RESET}`;
+}
 
 /**
  * Applies a consistent color to task status values.
@@ -7,14 +22,14 @@ import chalk from 'chalk';
  */
 export function colorStatus(status) {
   if (status === 'done') {
-    return chalk.green(status);
+    return ansi(GREEN, status);
   }
 
   if (status === 'in-progress') {
-    return chalk.yellow(status);
+    return ansi(YELLOW, status);
   }
 
-  return chalk.red(status);
+  return ansi(RED, status);
 }
 
 /**
@@ -24,12 +39,12 @@ export function colorStatus(status) {
  */
 export function colorPriority(priority) {
   if (priority === 'high') {
-    return chalk.bold.red(priority);
+    return ansi(BOLD + RED, priority);
   }
 
   if (priority === 'medium') {
-    return chalk.bold.yellow(priority);
+    return ansi(BOLD + YELLOW, priority);
   }
 
-  return chalk.dim(priority);
+  return ansi(DIM, priority);
 }
