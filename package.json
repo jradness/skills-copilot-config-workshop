@@ -1,0 +1,25 @@
+{
+  "name": "skills-copilot-config-workshop",
+  "version": "1.0.0",
+  "description": "<img src=\"https://octodex.github.com/images/Professortocat_v2.png\" align=\"right\" height=\"200px\" />",
+  "main": "src/index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jradness/skills-copilot-config-workshop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jradness/skills-copilot-config-workshop/issues"
+  },
+  "homepage": "https://github.com/jradness/skills-copilot-config-workshop#readme",
+  "type": "module"
+}
