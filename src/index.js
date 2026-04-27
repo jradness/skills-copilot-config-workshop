@@ -4,13 +4,38 @@ import {
   listTasks,
   updateTask,
 } from './services/taskService.js';
+import { colorPriority, colorStatus } from './utils/colors.js';
 
 function printSection(title) {
   console.log(`\n=== ${title} ===`);
 }
 
 function printData(label, value) {
-  console.log(`${label}:`, JSON.stringify(value, null, 2));
+  console.log(`${label}:`, formatValueForDisplay(value));
+}
+
+function formatValueForDisplay(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => formatValueForDisplay(item));
+  }
+
+  if (value !== null && typeof value === 'object') {
+    const formatted = {};
+
+    for (const [key, currentValue] of Object.entries(value)) {
+      if (key === 'status' && typeof currentValue === 'string') {
+        formatted[key] = colorStatus(currentValue);
+      } else if (key === 'priority' && typeof currentValue === 'string') {
+        formatted[key] = colorPriority(currentValue);
+      } else {
+        formatted[key] = formatValueForDisplay(currentValue);
+      }
+    }
+
+    return formatted;
+  }
+
+  return value;
 }
 
 function main() {
